@@ -1,0 +1,193 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+model Books {
+  accountsBooksItems AccountsBooks[]
+  clientsBooksItems  ClientsBooks[]
+  createdAt          DateTime        @default(now())
+  id                 String          @id @default(cuid())
+  name               String?
+  textsItems         Texts[]
+  updatedAt          DateTime        @updatedAt
+}
+
+model Texts {
+  book               Books?          @relation(fields: [bookId], references: [id])
+  bookId             String?
+  captionsItems      Captions[]
+  createdAt          DateTime        @default(now())
+  id                 String          @id @default(cuid())
+  name               String?
+  ordersItems        Orders[]
+  textsHashtagsItems TextsHashtags[]
+  textsLabelsItems   TextsLabels[]
+  updatedAt          DateTime        @updatedAt
+}
+
+model Captions {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  text      Texts?   @relation(fields: [textId], references: [id])
+  textId    String?
+  updatedAt DateTime @updatedAt
+}
+
+model Orders {
+  account           Accounts?      @relation(fields: [accountId], references: [id])
+  accountId         String?
+  createdAt         DateTime       @default(now())
+  id                String         @id @default(cuid())
+  phone             Phones?        @relation(fields: [phoneId], references: [id])
+  phoneId           String?
+  text              Texts?         @relation(fields: [textId], references: [id])
+  textId            String?
+  updatedAt         DateTime       @updatedAt
+  videoMetricsItems VideoMetrics[]
+}
+
+model Clients {
+  clientsBooksItems ClientsBooks[]
+  createdAt         DateTime       @default(now())
+  id                String         @id @default(cuid())
+  name              String?
+  updatedAt         DateTime       @updatedAt
+}
+
+model SoundsLabels {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  label     Labels?  @relation(fields: [labelId], references: [id])
+  labelId   String?
+  sound     Sounds?  @relation(fields: [soundId], references: [id])
+  soundId   String?
+  updatedAt DateTime @updatedAt
+}
+
+model Accounts {
+  accountsBooksItems AccountsBooks[]
+  accountsName       String?
+  createdAt          DateTime        @default(now())
+  followers          Int?
+  id                 String          @id @default(cuid())
+  ordersItems        Orders[]
+  phone              Phones?         @relation(fields: [phoneId], references: [id])
+  phoneId            String?
+  profilePicture     String?
+  totalLikes         Int?
+  updatedAt          DateTime        @updatedAt
+}
+
+model Phones {
+  accountsItems Accounts[]
+  createdAt     DateTime   @default(now())
+  crew          Crew?      @relation(fields: [crewId], references: [id])
+  crewId        String?
+  id            String     @id @default(cuid())
+  name          String?
+  ordersItems   Orders[]
+  updatedAt     DateTime   @updatedAt
+}
+
+model AccountsBooks {
+  account   Accounts? @relation(fields: [accountId], references: [id])
+  accountId String?
+  book      Books?    @relation(fields: [bookId], references: [id])
+  bookId    String?
+  createdAt DateTime  @default(now())
+  id        String    @id @default(cuid())
+  updatedAt DateTime  @updatedAt
+}
+
+model Sounds {
+  createdAt         DateTime       @default(now())
+  id                String         @id @default(cuid())
+  name              String?
+  soundsLabelsItems SoundsLabels[]
+  updatedAt         DateTime       @updatedAt
+}
+
+model ClientsBooks {
+  book      Books?   @relation(fields: [bookId], references: [id])
+  bookId    String?
+  client    Clients? @relation(fields: [clientId], references: [id])
+  clientId  String?
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+}
+
+model TextsHashtags {
+  createdAt DateTime  @default(now())
+  hashtag   Hashtags? @relation(fields: [hashtagId], references: [id])
+  hashtagId String?
+  id        String    @id @default(cuid())
+  text      Texts?    @relation(fields: [textId], references: [id])
+  textId    String?
+  updatedAt DateTime  @updatedAt
+}
+
+model Hashtags {
+  createdAt          DateTime        @default(now())
+  hashtag            String?
+  id                 String          @id @default(cuid())
+  textsHashtagsItems TextsHashtags[]
+  updatedAt          DateTime        @updatedAt
+}
+
+model VideoMetrics {
+  comments  Int?
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  likes     Int?
+  order     Orders?  @relation(fields: [orderId], references: [id])
+  orderId   String?
+  saves     Int?
+  shares    Int?
+  updatedAt DateTime @updatedAt
+  views     Int?
+}
+
+model Labels {
+  createdAt         DateTime       @default(now())
+  id                String         @id @default(cuid())
+  name              String?
+  soundsLabelsItems SoundsLabels[]
+  textsLabelsItems  TextsLabels[]
+  updatedAt         DateTime       @updatedAt
+}
+
+model TextsLabels {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  label     Labels?  @relation(fields: [labelId], references: [id])
+  labelId   String?
+  text      Texts?   @relation(fields: [textId], references: [id])
+  textId    String?
+  updatedAt DateTime @updatedAt
+}
+
+model Crew {
+  createdAt   DateTime @default(now())
+  id          String   @id @default(cuid())
+  name        String?
+  phonesItems Phones[]
+  updatedAt   DateTime @updatedAt
+}
